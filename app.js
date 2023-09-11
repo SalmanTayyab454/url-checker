@@ -11,41 +11,41 @@ function validUrl(url) {
     return urlPattern.test(url)
 }
 
+const checkIfFile = (url) => {
+    url = new URL(url);
+    return url.pathname.split('/').pop().indexOf('.') > 0;
+}
+
 const urlInput = document.getElementById('input');
-urlInput.addEventListener('input', throttle((event) => {
+let timer;
+
+urlInput.addEventListener('input', (event) => {
+    clearTimeout(timer); // Clear the previous timer
     const enteredUrl = event.target.value;
-    console.log('Entered Url', enteredUrl);
     const finalElement = document.getElementById('message');
     if (validUrl(enteredUrl)) {
         finalElement.textContent = 'Please wait checking for URL existence';
-        checkURLExistence(enteredUrl);
+        // existence check Throttle
+        timer = setTimeout(() => {
+            checkURLExistence(enteredUrl);
+        }, 1000);
     } else {
         finalElement.textContent = 'URL format is invalid';
     }
-}, 1000));
+});
 
 function checkURLExistence(url) {
     setTimeout(() => {
-        const isUrlExists = Math.random() < 0.5;
+        const isUrlExists = Math.random() < 0.5; // Simulating the mock server call
         const finalElement = document.getElementById('message');
         if (isUrlExists) {
-            finalElement.textContent = `${url} exists and is also valid.`;
+            if (checkIfFile(url)) {
+                finalElement.textContent = `${url} exists and is a file.`;
+            } else {
+                finalElement.textContent = `${url} exists and is a folder.`;
+            }
         } else {
-            finalElement.textContent = `${url} doesn't exists and is also invalid.`;
+            finalElement.textContent = `${url} doesn't exist or is invalid.`;
         }
     }, 1000);
-}
-
-function throttle(func, delay) {
-    let timer;
-    return function() {
-        const context = this;
-        const args = arguments;
-        if (!timer) {
-            func.apply(context, args);
-            timer = setTimeout(() => {
-                timer = null;
-            }, delay);
-        }
-    }
 }
