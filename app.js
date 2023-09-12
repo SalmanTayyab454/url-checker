@@ -4,7 +4,6 @@
  * @param {string} url - The URL to validate.
  * @returns {boolean} Returns true if the URL is valid, otherwise false.
  */
-
 function validUrl(url) {
     // Regular expression pattern to validate URLs
     const urlPattern = new RegExp(
@@ -32,7 +31,6 @@ function validUrl(url) {
  * @param {string} url - The URL to check.
  * @returns {boolean} Returns true if the URL represents a file, otherwise false.
  */
-
 const checkIfFile = (url) => {
     // Create a URL object from the given URL string
     // Extract the pathname from the URL, split it by '/', and get the last part
@@ -69,20 +67,16 @@ urlInput.addEventListener('input', (event) => {
  *
  * @param {string} url - The URL to check for existence.
  */
-
 function checkURLExistence(url) {
-    // Get the DOM element where the result message will be displayed
     const messageElement = document.getElementById('message');
     // Simulate a server call to check the existence of the URL
     if (Math.random() < 0.5) {
-        // If the URL exists, determine if it represents a file or folder
         if (checkIfFile(url)) {
             messageElement.textContent = `${url} exists and is a file.`;
         } else {
             messageElement.textContent = `${url} exists and is a folder.`;
         }
     } else {
-        // If the URL doesn't exist or is invalid, display an appropriate message
         messageElement.textContent = `${url} doesn't exist or is invalid.`;
     }
 }
