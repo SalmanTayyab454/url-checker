@@ -1,51 +1,88 @@
+/**
+ * Check if a given URL is valid.
+ *
+ * @param {string} url - The URL to validate.
+ * @returns {boolean} Returns true if the URL is valid, otherwise false.
+ */
+
 function validUrl(url) {
+    // Regular expression pattern to validate URLs
     const urlPattern = new RegExp(
-        '^([a-zA-Z]+:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR IP (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$', // fragment locator
+        // protocol
+        '^([a-zA-Z]+:\\/\\/)?' +
+        // domain name
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+        // OR IP (v4) address
+        '((\\d{1,3}\\.){3}\\d{1,3}))' +
+        // port and path
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+        // query string
+        '(\\?[;&a-z\\d%_.~+=-]*)?' +
+        // fragment locator
+        '(\\#[-a-z\\d_]*)?$',
         'i'
     );
+    // Test if the given URL matches the pattern
     return urlPattern.test(url)
 }
 
+/**
+ * Check if a given URL represents a file.
+ *
+ * @param {string} url - The URL to check.
+ * @returns {boolean} Returns true if the URL represents a file, otherwise false.
+ */
+
 const checkIfFile = (url) => {
-    url = new URL(url);
-    return url.pathname.split('/').pop().indexOf('.') > 0;
+    // Create a URL object from the given URL string
+    // Extract the pathname from the URL, split it by '/', and get the last part
+    // And also check if the fileName contains a '.' (indicating a file extension)
+    return new URL(url).pathname.split('/').pop().indexOf('.') > 0;
 }
 
 const urlInput = document.getElementById('input');
 let timer;
 
 urlInput.addEventListener('input', (event) => {
-    clearTimeout(timer); // Clear the previous timer
+    // Clear the previous timer
+    clearTimeout(timer);
     const enteredUrl = event.target.value;
-    const finalElement = document.getElementById('message');
+    const messageElement = document.getElementById('message');
     if (validUrl(enteredUrl)) {
-        finalElement.textContent = 'Please wait checking for URL existence';
+        messageElement.textContent = 'Please wait checking for URL existence';
         // existence check Throttle
-        timer = setTimeout(() => {
-            checkURLExistence(enteredUrl);
+        timer = setTimeout(async() => {
+            try {
+                await checkURLExistence(enteredUrl);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }, 1000);
     } else {
-        finalElement.textContent = 'URL format is invalid';
+        messageElement.textContent = 'URL format is invalid';
     }
 });
 
+
+/**
+ * Check the existence of a URL and display the result message.
+ *
+ * @param {string} url - The URL to check for existence.
+ */
+
 function checkURLExistence(url) {
-    setTimeout(() => {
-        const isUrlExists = Math.random() < 0.5; // Simulating the mock server call
-        const finalElement = document.getElementById('message');
-        if (isUrlExists) {
-            if (checkIfFile(url)) {
-                finalElement.textContent = `${url} exists and is a file.`;
-            } else {
-                finalElement.textContent = `${url} exists and is a folder.`;
-            }
+    // Get the DOM element where the result message will be displayed
+    const messageElement = document.getElementById('message');
+    // Simulate a server call to check the existence of the URL
+    if (Math.random() < 0.5) {
+        // If the URL exists, determine if it represents a file or folder
+        if (checkIfFile(url)) {
+            messageElement.textContent = `${url} exists and is a file.`;
         } else {
-            finalElement.textContent = `${url} doesn't exist or is invalid.`;
+            messageElement.textContent = `${url} exists and is a folder.`;
         }
-    }, 1000);
+    } else {
+        // If the URL doesn't exist or is invalid, display an appropriate message
+        messageElement.textContent = `${url} doesn't exist or is invalid.`;
+    }
 }
